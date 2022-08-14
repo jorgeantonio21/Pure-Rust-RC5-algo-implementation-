@@ -3,7 +3,7 @@ use std::cmp::max;
 const VERSION: usize = 1; // version 1
 const WORDS: usize = 4; // 4-bytes long, or 32-bit long
 const ROUNDS: usize = 12; // 1 round total
-const BYTES: usize = 16; // Key generatio"n of length 10-bytes
+const BYTES: usize = 16; // Key generation of length 10-bytes
 
 /*
  * This function should return a cipher text for a given key and plaintext
@@ -72,16 +72,20 @@ fn decode(key: Vec<u8>, ciphertext: Vec<u8>) -> Result<Vec<u8>, &'static str> {
     let s_table = generate_block_cipher(key);
 
     // the algorithm uses ROUND iterations, but it starts with a zeroth evaluation first
-    for i in 0..(2 * ROUNDS + 1) {
+    for i in (1..(ROUNDS + 1)).rev() {
         b_from_le_bytes = b_from_le_bytes
-            .wrapping_sub(s_table[2 * (ROUNDS + 1 - i) + 1])
-            .wrapping_shr(a_from_le_bytes)
+            .wrapping_sub(s_table[2 * i + 1])
+            .rotate_right(a_from_le_bytes)
             ^ a_from_le_bytes;
         a_from_le_bytes = a_from_le_bytes
-            .wrapping_sub(s_table[2 * (ROUNDS + 1 - i)])
-            .wrapping_shr(b_from_le_bytes)
+            .wrapping_sub(s_table[2 * i])
+            .rotate_right(b_from_le_bytes)
             ^ b_from_le_bytes;
     }
+
+    // last iteration
+    a_from_le_bytes = a_from_le_bytes.wrapping_sub(s_table[0]);
+    b_from_le_bytes = b_from_le_bytes.wrapping_sub(s_table[1]);
 
     a_block = a_from_le_bytes.to_le_bytes();
     b_block = b_from_le_bytes.to_le_bytes();
@@ -100,7 +104,7 @@ fn decode(key: Vec<u8>, ciphertext: Vec<u8>) -> Result<Vec<u8>, &'static str> {
 fn generate_block_cipher(key: Vec<u8>) -> Vec<u32> {
     // by the protocol design, we are guaranteed that the length of the
     // key block is less than 255 = 2^8 - 1
-    let mut l = if key.len() == 0 {
+    let mut l = if key.is_empty() {
         vec![0u32]
     } else {
         (0..(key.len() as u8))
@@ -118,7 +122,7 @@ fn generate_block_cipher(key: Vec<u8>) -> Vec<u32> {
     let p_w = u32::from_str_radix("b7e15163", 16).unwrap(); // first magic number
     let q_w = u32::from_str_radix("9e3779b9", 16).unwrap(); // second magic number
 
-    let s_table = (0..(2u32 * (ROUNDS as u32 + 1))).collect::<Vec<u32>>();
+    let s_table = 0..(2u32 * (ROUNDS as u32 + 1));
     let mut s_table = s_table
         .into_iter()
         .map(|x| x.wrapping_mul(q_w).wrapping_add(p_w))
