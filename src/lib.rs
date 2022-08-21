@@ -130,8 +130,8 @@ impl<T: Unsigned16To64 + CipherMagicConstants + Copy> Rc5CipherStream<T> for RC5
             .map(|x| T::from_usize(x).wrapping_mul(q_w).wrapping_add(p_w))
             .collect::<Vec<T>>();
 
-        let mut i = T::min();
-        let mut j = T::min();
+        let mut i = T::min().to_usize();
+        let mut j = T::min().to_usize();
 
         let mut a_block = T::min();
         let mut b_block = T::min();
@@ -142,18 +142,18 @@ impl<T: Unsigned16To64 + CipherMagicConstants + Copy> Rc5CipherStream<T> for RC5
         let max_iters = max(s_len, l_len);
 
         for _ in 0..(3 * max_iters) {
-            a_block = s_table[i.to_usize()]
+            a_block = s_table[i]
                 .wrapping_add(a_block)
                 .wrapping_add(b_block)
                 .rotate_left(T::from_usize(3usize));
-            b_block = (l[j.to_usize()].wrapping_add(a_block).wrapping_add(b_block))
+            b_block = (l[j].wrapping_add(a_block).wrapping_add(b_block))
                 .rotate_left(a_block.wrapping_add(b_block));
 
-            s_table[i.to_usize()] = a_block;
-            l[j.to_usize()] = b_block;
+            s_table[i] = a_block;
+            l[j] = b_block;
 
-            i = T::from_usize((i.to_usize() + 1) % s_len);
-            j = T::from_usize((j.to_usize() + 1) % l_len);
+            i = (i + 1) % s_len;
+            j = (j + 1) % l_len;
         }
 
         s_table
