@@ -1,5 +1,6 @@
 use std::cmp::max;
 
+#[allow(dead_code)]
 const VERSION: usize = 1; // version 1
 const WORDS: usize = 4; // 4-bytes long, or 32-bit long
 const ROUNDS: usize = 12; // 1 round total
@@ -9,6 +10,7 @@ const BYTES: usize = 16; // Key generation of length 10-bytes
  * This function should return a cipher text for a given key and plaintext
  *
  */
+#[allow(dead_code)]
 fn encode(key: Vec<u8>, plaintext: Vec<u8>) -> Result<Vec<u8>, &'static str> {
     if key.len() != BYTES {
         return Err("invalid encryption key length");
@@ -53,6 +55,7 @@ fn encode(key: Vec<u8>, plaintext: Vec<u8>) -> Result<Vec<u8>, &'static str> {
  * This function should return a plaintext for a given key and ciphertext
  *
  */
+#[allow(dead_code)]
 fn decode(key: Vec<u8>, ciphertext: Vec<u8>) -> Result<Vec<u8>, &'static str> {
     if key.len() != BYTES {
         return Err("invalid decryption key length");
@@ -101,6 +104,7 @@ fn decode(key: Vec<u8>, ciphertext: Vec<u8>) -> Result<Vec<u8>, &'static str> {
  * This function should return the key generation for the RC5 algorithm
  *
  */
+#[allow(dead_code)]
 fn generate_block_cipher(key: Vec<u8>) -> Vec<u32> {
     // by the protocol design, we are guaranteed that the length of the
     // key block is less than 255 = 2^8 - 1
