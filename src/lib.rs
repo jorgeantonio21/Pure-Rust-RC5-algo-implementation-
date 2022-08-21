@@ -12,6 +12,7 @@ struct RC5<T: Unsigned16To64> {
 }
 
 impl<T: Unsigned16To64> RC5<T> {
+    #[allow(dead_code)]
     fn new(key: Vec<u8>, words: usize, rounds: usize, bytes: usize) -> Self {
         RC5 {
             key,
