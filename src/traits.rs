@@ -12,7 +12,7 @@ pub trait Unsigned16To64 {
     fn rotate_left(self, other: Self) -> Self;
     fn rotate_right(self, other: Self) -> Self;
     fn xor(self, other: Self) -> Self;
-    fn min() -> Self;
+    fn zero() -> Self;
     fn from_str_radix(val: &str, base: u32) -> Self;
     fn from_usize(val: usize) -> Self;
     fn to_usize(&self) -> usize;
@@ -61,7 +61,7 @@ macro_rules! impl_unsigned_16_to_64 {
                 self ^ other
             }
 
-            fn min() -> Self {
+            fn zero() -> Self {
                 Self::MIN
             }
 
@@ -82,27 +82,26 @@ macro_rules! impl_unsigned_16_to_64 {
 impl_unsigned_16_to_64!(u16, u32, u64);
 
 pub trait CipherMagicConstants {
-    const P_W: &'static str;
-    const Q_W: &'static str;
+    const P_W: Self;
+    const Q_W: Self;
 }
 
 impl CipherMagicConstants for u16 {
-    const P_W: &'static str = "b7e1"; // first magic number
-    const Q_W: &'static str = "9e37"; // second magic number
+    const P_W: Self = 0xb7e1; // first magic number
+    const Q_W: Self = 0x9e37; // second magic number
 }
 
 impl CipherMagicConstants for u32 {
-    const P_W: &'static str = "b7e15163"; // first magic number
-    const Q_W: &'static str = "9e3779b9"; // second magic number
+    const P_W: Self = 0xb7e15163; // first magic number
+    const Q_W: Self = 0x9e3779b9; // second magic number
 }
 
 impl CipherMagicConstants for u64 {
-    const P_W: &'static str = "b7e151628aed2a6b"; // fist magic number
-    const Q_W: &'static str = "9e3779b97f47c15"; // second magic number
+    const P_W: Self = 0xb7e151628aed2a6b; // fist magic number
+    const Q_W: Self = 0x9e3779b97f47c15; // second magic number
 }
 
 pub trait Rc5CipherStream<T: Unsigned16To64> {
-    fn encode(&self, plaintext: Vec<u8>) -> Result<Vec<u8>, &'static str>;
-    fn decode(&self, plaintext: Vec<u8>) -> Result<Vec<u8>, &'static str>;
-    fn generate_block_cipher(&self) -> Vec<T>;
+    fn encode(&self, plaintext: &[u8]) -> Result<Vec<u8>, &'static str>;
+    fn decode(&self, plaintext: &[u8]) -> Result<Vec<u8>, &'static str>;
 }
