@@ -111,8 +111,6 @@ impl<T: Unsigned16To64 + CipherMagicConstants + Copy> Rc5CipherStream<T> for RC5
         a_block = a_from_le_bytes.to_le_bytes();
         b_block = b_from_le_bytes.to_le_bytes();
 
-        println!("the size is: {}", std::mem::size_of::<T>());
-
         let mut ciphertext = Vec::with_capacity(2 * std::mem::size_of::<Self>());
         ciphertext.extend_from_slice(a_block.as_ref());
         ciphertext.extend_from_slice(b_block.as_ref());
